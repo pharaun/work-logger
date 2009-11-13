@@ -8,12 +8,7 @@
 #
 
 require 'gtk2'
+require 'work-logger'
 
-
-builder = Gtk::Builder.new
-builder.add_from_file('view/main.glade')
-
-window = builder.get_object('work_logger')
-window.show_all
-
-Gtk.main
+work_gui = Work_logger::new
+work_gui.run

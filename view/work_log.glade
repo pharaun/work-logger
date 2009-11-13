@@ -35,16 +35,8 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkImageMenuItem" id="save">
-                        <property name="label">gtk-save</property>
-                        <property name="visible">True</property>
-                        <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkImageMenuItem" id="save_as">
-                        <property name="label">gtk-save-as</property>
+                      <object class="GtkImageMenuItem" id="close">
+                        <property name="label">gtk-close</property>
                         <property name="visible">True</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
@@ -246,6 +238,26 @@
                 <property name="position">3</property>
               </packing>
             </child>
+            <child>
+              <object class="GtkAlignment" id="save_entry_alignment">
+                <property name="visible">True</property>
+                <property name="right_padding">6</property>
+                <child>
+                  <object class="GtkButton" id="save_entry">
+                    <property name="label" translatable="yes">gtk-save</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <property name="use_stock">True</property>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="pack_type">end</property>
+                <property name="position">4</property>
+              </packing>
+            </child>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -273,7 +285,6 @@
         <child>
           <object class="GtkStatusbar" id="statusbar">
             <property name="visible">True</property>
-            <property name="spacing">2</property>
           </object>
           <packing>
             <property name="expand">False</property>
