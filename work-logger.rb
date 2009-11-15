@@ -126,7 +126,9 @@ class Work_logger
 	##############################
 	# Help menu
 	##############################
-	@about.signal_connect('activate') { about_dialog }
+	@about.signal_connect('activate') do
+	    create_about.show
+	end
 
 	##############################
 	# Toolbar
@@ -155,8 +157,27 @@ class Work_logger
     end
 
 
-    def about_dialog
-	puts "The about dialog"
+    def create_about
+	about = Gtk::AboutDialog.new
+
+	about.name = "Work Logger"
+	about.program_name = "Work Logger"
+
+	about.version = "0.1 - Alpha"
+	about.copyright = "Copyright (c) 2009, Anja Berens"
+
+	about.license = "You can redistribute it and/or modify it under the terms of the GPL's licence."
+	about.wrap_license = true
+
+	about.website = "http://amrutlar.com/work_logger"
+
+	about.authors = ["Anja Berens"]
+	about.documenters = ["Anja Berens"]
+
+	# Signal
+	about.signal_connect('response') {about.hide_all}
+
+	return about
     end
 
 
