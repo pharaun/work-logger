@@ -113,14 +113,6 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkImageMenuItem" id="delete">
-                        <property name="label">gtk-delete</property>
-                        <property name="visible">True</property>
-                        <property name="use_underline">True</property>
-                        <property name="use_stock">True</property>
-                      </object>
-                    </child>
-                    <child>
                       <object class="GtkSeparatorMenuItem" id="seperator_edit2">
                         <property name="visible">True</property>
                       </object>
