@@ -9,6 +9,8 @@
 
 require 'gtk2'
 require 'work-logger'
+require 'sqlite'
 
-work_gui = Work_logger::new
+sqlite = Sqlite::new
+work_gui = Work_logger::new(sqlite)
 work_gui.run

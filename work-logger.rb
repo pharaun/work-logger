@@ -14,7 +14,9 @@ require 'gtk2'
 
 class Work_logger
 
-    def initialize
+    def initialize(db)
+	@db = db
+
 	builder = Gtk::Builder.new
 	builder.add_from_file('view/work_log.glade')
 
@@ -40,7 +42,7 @@ class Work_logger
 
 	# Toolbar
 	@back = builder.get_object('back')
-	@date = builder.get_object('date')
+	@date_dropdown = builder.get_object('date')
 	@today = builder.get_object('today')
 	@forward = builder.get_object('forward')
 	@save_entry = builder.get_object('save_entry')
@@ -70,8 +72,18 @@ class Work_logger
 	update_statusbar
     end
 
-    def date_init
 
+    def date_init
+	@date = Date.today(Date::ENGLAND)
+
+	# Setup the date_dropdown combobox
+	list_store = Gtk::ListStore.new(String)
+	@date_dropdown.model = list_store
+	@date_dropdown.text_column = 0
+
+	# Date
+	(list_store.append())[0] = @date.to_s
+	@date_dropdown.active = 0
     end
 
 
@@ -139,20 +151,35 @@ class Work_logger
 	# Toolbar
 	##############################
 	@back.signal_connect('clicked') do
-	    puts "Go back one day on the textview"
+	    @date = @date - 1
+	    date_update
 	end
 
 	@today.signal_connect('clicked') do
-	    puts "Go to today on the textview"
+	    @date = Date.today(Date::ENGLAND)
+	    date_update
 	end
 
 	@forward.signal_connect('clicked') do
-	    puts "Go forward one day on the textview"
+	    @date = @date.next
+	    date_update
 	end
 
 	@save_entry.signal_connect('clicked') do
 	    puts "Save the current entry to the db"
 	end
+    end
+
+
+    def date_update
+	# Date
+	(@date_dropdown.model).clear
+	((@date_dropdown.model).append())[0] = @date.to_s
+	@date_dropdown.active = 0
+
+	# See if sqldb has an entry for that day
+	# update textview
+	puts "Checking if sqldb has the 'said' day in its table..."
     end
 
 
