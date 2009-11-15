@@ -63,6 +63,11 @@ class Work_logger
 	##############################
 	# Text buffer/viewer signals
 	##############################
+	text_buffer.signal_connect('changed') {update_statusbar}
+	text_buffer.signal_connect('mark-set') {update_statusbar}
+	@textview.signal_connect('move-cursor') {update_statusbar}
+
+	update_statusbar
     end
 
     def date_init
@@ -157,10 +162,24 @@ class Work_logger
     end
 
 
+    def update_statusbar
+	if !@statusbar_id.nil?
+	    @statusbar.pop(@statusbar_id)
+	end
+
+	buffer = @textview.buffer
+	iter = buffer.get_iter_at_mark(buffer.get_mark("insert"))
+
+	# TODO: Add in "save/unsaved" status
+	@statusbar_id = @statusbar.push(@statusbar.get_context_id("textview"), \
+	    "Line: #{iter.line + 1}, Column: #{iter.line_offset + 1}")
+    end
+
+
     def create_about
 	about = Gtk::AboutDialog.new
 
-	about.name = "Work Logger"
+	about.name = "WorkLogger"
 	about.program_name = "Work Logger"
 
 	about.version = "0.1 - Alpha"
