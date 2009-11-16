@@ -105,11 +105,20 @@ class Sqlite
     end
 
 
-    def store_text_entry(date)
+    def store_text_entry(date, entry)
 	if @db.nil?
 	    raise IOError, "Database is not open!", caller
 	else
-
+	    sql = "SELECT id FROM logs WHERE date = ?"
+	    id = @db.execute(sql, date.mjd)
+	    puts id
+	    if (id[0]).nil?
+		sql = "INSERT INTO logs (date, entry) VALUES (?, ?)"
+		@db.execute(sql, date.mjd, entry)
+	    else
+		sql = "UPDATE logs SET entry = ? WHERE id = ?"
+		@db.execute(sql, entry, id)
+	    end
 	end
     end
 end

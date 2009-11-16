@@ -29,8 +29,6 @@ class Work_logger
 	@quit = builder.get_object('quit')
 
 	# Edit menu
-	@undo = builder.get_object('undo')
-	@redo = builder.get_object('redo')
 	@cut = builder.get_object('cut')
 	@copy = builder.get_object('copy')
 	@paste = builder.get_object('paste')
@@ -56,6 +54,9 @@ class Work_logger
 	@scrolled_window = builder.get_object('scrolled_window')
 	@edit_menu = builder.get_object('edit')
 
+	# Save button is inactive till the textbuffer is altered
+	# TODO: Implement this context sensive save in a rational manner
+	#@save_entry.sensitive = false
 
 	# Initalize the signals
 	textview_init
@@ -127,14 +128,6 @@ class Work_logger
 	##############################
 	# Edit menu
 	##############################
-	@undo.signal_connect('activate') do
-	    puts "Undo the previous action on the textview"
-	end
-
-	@redo.signal_connect('activate') do
-	    puts "Redo the previous action on the textview"
-	end
-
 	@cut.signal_connect('activate') do
 	    @textview.signal_emit('cut_clipboard')
 	end
@@ -184,7 +177,7 @@ class Work_logger
 	end
 
 	@save_entry.signal_connect('clicked') do
-	    puts "Save the current entry to the db"
+	    @db.store_text_entry(@date, (@textview.buffer).get_text)
 	end
     end
 
@@ -201,6 +194,9 @@ class Work_logger
 	if !result.nil?
 	    (@textview.buffer).set_text(result)
 	end
+
+	# Grab focus
+	@textview.grab_focus
     end
 
 
@@ -298,6 +294,9 @@ class Work_logger
 	@scrolled_window.sensitive = true
 	@edit_menu.sensitive = true
 	@close.sensitive = true
+
+	# Grab focus
+	@textview.grab_focus
     end
 
 
