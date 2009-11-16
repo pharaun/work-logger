@@ -92,15 +92,22 @@ class Work_logger
 	# File menu
 	##############################
 	@new.signal_connect('activate') do
-	    puts "Create a new sqlite db"
+	    filename = file_choicer("New Database", true)
+	    if !filename.nil?
+		@db.create(filename)
+	    end
 	end
 
 	@open.signal_connect('activate') do
-	    puts "Open the selected sqlite db"
+	    filename = file_choicer("Open Database", false)
+	    if !filename.nil?
+		@db.open(filename)
+	    end
+	    puts "Load the today entry into the textview"
 	end
 
 	@close.signal_connect('activate') do
-	    puts "Tidying up and close the currently open sqlite db"
+	    @db.close
 	end
 
 	@quit.signal_connect('activate') { quit }
@@ -185,6 +192,7 @@ class Work_logger
 
     def quit
 	puts "Tidying up and quitting the program"
+	@db.close
 	Gtk.main_quit
     end
 
@@ -224,6 +232,38 @@ class Work_logger
 	about.signal_connect('response') {about.hide_all}
 
 	return about
+    end
+
+
+    def file_choicer(title, new)
+	if new
+	    mode = Gtk::FileChooser::ACTION_SAVE
+	    button = [Gtk::Stock::SAVE, Gtk::Dialog::RESPONSE_OK]
+	else
+	    mode = Gtk::FileChooser::ACTION_OPEN
+	    button = [Gtk::Stock::OPEN, Gtk::Dialog::RESPONSE_OK]
+	end
+
+	dialog = Gtk::FileChooserDialog.new(title,
+					    @window,
+					    mode,
+					    nil,
+					    [Gtk::Stock::CANCEL,
+						Gtk::Dialog::RESPONSE_CANCEL],
+					    button)
+
+	# File filter
+	filter = Gtk::FileFilter.new
+	filter.add_pattern(@db.file_regex)
+	filter.name = "Database File"
+	dialog.filter = filter
+
+	if dialog.run == Gtk::Dialog::RESPONSE_OK
+	    filename = dialog.filename
+	end
+	dialog.destroy
+
+	return @db.check_filename(filename)
     end
 
 
