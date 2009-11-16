@@ -51,10 +51,17 @@ class Work_logger
 	@textview = builder.get_object('textview')
 	@statusbar = builder.get_object('statusbar')
 
+	# Activate/inactivate
+	@button_hbox = builder.get_object('button_hbox')
+	@scrolled_window = builder.get_object('scrolled_window')
+	@edit_menu = builder.get_object('edit')
+
+
 	# Initalize the signals
 	textview_init
 	date_init
 	signal_init
+	inactive
     end
 
 
@@ -95,6 +102,7 @@ class Work_logger
 	    filename = file_choicer("New Database", true)
 	    if !filename.nil?
 		@db.create(filename)
+		active
 	    end
 	end
 
@@ -102,12 +110,15 @@ class Work_logger
 	    filename = file_choicer("Open Database", false)
 	    if !filename.nil?
 		@db.open(filename)
+
+		date_update
+		active
 	    end
-	    puts "Load the today entry into the textview"
 	end
 
 	@close.signal_connect('activate') do
 	    @db.close
+	    inactive
 	end
 
 	@quit.signal_connect('activate') { quit }
@@ -186,13 +197,20 @@ class Work_logger
 
 	# See if sqldb has an entry for that day
 	# update textview
-	puts "Checking if sqldb has the 'said' day in its table..."
+	result = @db.fetch_text_entry(@date)
+	if !result.nil?
+	    (@textview.buffer).set_text(result)
+	end
     end
 
 
     def quit
-	puts "Tidying up and quitting the program"
-	@db.close
+	begin
+	    @db.close
+	rescue IOError
+	    puts "Ignoring - IOError from @db.close"
+	end
+
 	Gtk.main_quit
     end
 
@@ -264,6 +282,22 @@ class Work_logger
 	dialog.destroy
 
 	return @db.check_filename(filename)
+    end
+
+
+    def inactive
+	@button_hbox.sensitive = false
+	@scrolled_window.sensitive = false
+	@edit_menu.sensitive = false
+	@close.sensitive = false
+    end
+
+
+    def active
+	@button_hbox.sensitive = true
+	@scrolled_window.sensitive = true
+	@edit_menu.sensitive = true
+	@close.sensitive = true
     end
 
 

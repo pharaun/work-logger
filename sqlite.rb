@@ -22,7 +22,22 @@ class Sqlite
 	else
 	    @db = SQLite3::Database.new(filename)
 
-	    # TODO: Create the Db schema
+	    schema = %(
+		PRAGMA auto_vacuum = 1;
+		PRAGMA encoding = "UTF-8";
+		PRAGMA user_version = 1;
+		
+		-- Work log entry table
+		-- date is stored in "Modified Julian Day Number"
+		--      From Nov 17, 1858
+		CREATE TABLE logs (
+		    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+		    date INTEGER NOT NULL,
+		    entry TEXT NOT NULL
+		);
+	    )
+
+	    @db.execute_batch(schema)
 	end
     end
 
@@ -33,7 +48,15 @@ class Sqlite
 		if File.writable?(filename)
 		    @db = SQLite3::Database.open(filename)
 
-		    # TODO: Check the DB schema version
+		    # Check the DB schema version - Need to be same as
+		    # in the create function above
+		    user_version = @db.execute("PRAGMA user_version;")
+		    if (user_version.to_s).to_i != 1
+			@db.close
+			@db = nil
+
+			raise RuntimeError, "Wrong schema version!", caller
+		    end
 		else
 		    raise IOError, "File is not writtable!", caller
 		end
@@ -60,11 +83,33 @@ class Sqlite
 	return "*.sqlite"
     end
 
+
     def check_filename(filename)
 	if filename =~ /^.*\.sqlite/
 	    return filename
 	else
 	    return "#{filename}.sqlite"
+	end
+    end
+
+
+    def fetch_text_entry(date)
+	if @db.nil?
+	    raise IOError, "Database is not open!", caller
+	else
+	    sql = "SELECT entry FROM logs WHERE date = ?"
+	    text = @db.execute(sql, date.mjd)
+
+	    return text.to_s
+	end
+    end
+
+
+    def store_text_entry(date)
+	if @db.nil?
+	    raise IOError, "Database is not open!", caller
+	else
+
 	end
     end
 end
