@@ -79,6 +79,11 @@ class Sqlite
     end
 
 
+    def open?
+	return !@db.nil?
+    end
+
+
     def file_regex
 	return "*.sqlite"
     end
@@ -111,7 +116,7 @@ class Sqlite
 	else
 	    sql = "SELECT id FROM logs WHERE date = ?"
 	    id = @db.execute(sql, date.mjd)
-	    puts id
+	    puts "id: #{id}"
 	    if (id[0]).nil?
 		sql = "INSERT INTO logs (date, entry) VALUES (?, ?)"
 		@db.execute(sql, date.mjd, entry)

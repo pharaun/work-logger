@@ -77,6 +77,14 @@ class Work_logger
 	text_buffer.signal_connect('mark-set') {update_statusbar}
 	@textview.signal_connect('move-cursor') {update_statusbar}
 
+	# Text change signal
+	text_buffer.signal_connect('insert_text') {@text_changed = true}
+	text_buffer.signal_connect('delete_range') {@text_changed = true}
+	text_buffer.signal_connect('begin_user_action') {@user_action = true}
+
+	@text_changed = false
+	@user_action = false
+
 	update_statusbar
     end
 
@@ -92,6 +100,9 @@ class Work_logger
 	# Date
 	(list_store.append())[0] = @date.to_s
 	@date_dropdown.active = 0
+
+	# Calendar dropdown
+
     end
 
 
@@ -102,6 +113,12 @@ class Work_logger
 	@new.signal_connect('activate') do
 	    filename = file_choicer("New Database", true)
 	    if !filename.nil?
+		if @db.open?
+		    text_changed?
+
+		    @db.close
+		end
+
 		@db.create(filename)
 		active
 	    end
@@ -110,6 +127,12 @@ class Work_logger
 	@open.signal_connect('activate') do
 	    filename = file_choicer("Open Database", false)
 	    if !filename.nil?
+		if @db.open?
+		    text_changed?
+
+		    @db.close
+		end
+
 		@db.open(filename)
 
 		date_update
@@ -118,6 +141,8 @@ class Work_logger
 	end
 
 	@close.signal_connect('activate') do
+	    text_changed?
+
 	    @db.close
 	    inactive
 	end
@@ -162,16 +187,22 @@ class Work_logger
 	# Toolbar
 	##############################
 	@back.signal_connect('clicked') do
+	    text_changed?
+
 	    @date = @date - 1
 	    date_update
 	end
 
 	@today.signal_connect('clicked') do
+	    text_changed?
+
 	    @date = Date.today(Date::ENGLAND)
 	    date_update
 	end
 
 	@forward.signal_connect('clicked') do
+	    text_changed?
+
 	    @date = @date.next
 	    date_update
 	end
@@ -200,8 +231,31 @@ class Work_logger
     end
 
 
+    def text_changed?
+	# Pop up dialog asking if user wants to save or not
+	if (@text_changed and @user_action)
+	    dialog = Gtk::MessageDialog.new(@window,
+					    Gtk::Dialog::DESTROY_WITH_PARENT,
+					    Gtk::MessageDialog::QUESTION,
+					    Gtk::MessageDialog::BUTTONS_YES_NO,
+					"Do you want to save the current Log Entry?")
+
+	    if dialog.run == Gtk::Dialog::RESPONSE_YES
+		# Save this entry
+		@db.store_text_entry(@date, (@textview.buffer).get_text)
+	    end
+	    dialog.destroy
+	end
+	
+	@text_changed = false
+	@user_action = false
+    end
+
+
     def quit
 	begin
+	    text_changed?
+
 	    @db.close
 	rescue IOError
 	    puts "Ignoring - IOError from @db.close"
