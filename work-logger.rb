@@ -209,6 +209,9 @@ class Work_logger
 
 	@save_entry.signal_connect('clicked') do
 	    @db.store_text_entry(@date, (@textview.buffer).get_text)
+
+	    @text_changed = false
+	    @user_action = false
 	end
     end
 
