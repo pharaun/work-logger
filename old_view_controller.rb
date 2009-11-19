@@ -9,10 +9,12 @@
 # With much thanks to "Masao Mutoh" for his "Simple Text Editor"
 # which provided the inspiration and hints/guideline for this project
 #
+#
+# TMP TMP TMP
 
 require 'gtk2'
 
-class Work_logger
+class Work_controller
 
     def initialize(db)
 	@db = db

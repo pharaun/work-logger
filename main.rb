@@ -8,9 +8,14 @@
 #
 
 require 'gtk2'
-require 'work-logger'
+require 'work_view'
+require 'work_controller'
 require 'sqlite'
 
 sqlite = Sqlite::new
-work_gui = Work_logger::new(sqlite)
-work_gui.run
+controller = Work_controller::new(sqlite)
+view = Work_view::new(controller)
+controller.set_view(view)
+
+view.show_all
+Gtk.main
