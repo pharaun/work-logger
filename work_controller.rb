@@ -33,11 +33,7 @@ class Work_controller
 
 
     def date_today
-	if text_changed?
-	    if @view.save_text?
-		save_entry(@view.get_text)
-	    end
-	end
+	text_changed?
 
 	@date = Date.today(Date::ENGLAND)
 
@@ -56,11 +52,7 @@ class Work_controller
 
 
     def date_back
-	if text_changed?
-	    if @view.save_text?
-		save_entry(@view.get_text)
-	    end
-	end
+	text_changed?
 
 	@date = @date - 1
 
@@ -77,18 +69,13 @@ class Work_controller
 
 
     def date_forward
-	if text_changed?
-	    if @view.save_text?
-		save_entry(@view.get_text)
-	    end
-	end
+	text_changed?
 
 	@date = @date + 1
 
 	@view.date_update(@date)
 
-	re
-	sult = @db.fetch_text_entry(@date)
+	result = @db.fetch_text_entry(@date)
 
 	if !result.nil?
 	    @view.update_textview(result)
@@ -100,11 +87,7 @@ class Work_controller
 
     def new_database(filename)
 	if @db.open?
-	    if text_changed?
-		if @view.save_text?
-		    save_entry(@view.get_text)
-		end
-	    end
+	    text_changed?
 
 	    @db.close
 	end
@@ -117,11 +100,7 @@ class Work_controller
 
     def open_database(filename)
 	if @db.open?
-	    if text_changed?
-		if @view.save_text?
-		    save_entry(@view.get_text)
-		end
-	    end
+	    text_changed?
 
 	    @db.close
 	end
@@ -140,11 +119,7 @@ class Work_controller
 
     def close_database
 	if @db.open?
-	    if text_changed?
-		if @view.save_text?
-		    save_entry(@view.get_text)
-		end
-	    end
+	    text_changed?
 
 	    @db.close
 
@@ -159,7 +134,11 @@ class Work_controller
 
 
     def text_changed?
-	return (@text_changed and @user_action)
+	if (@text_changed and @user_action)
+	    if @view.save_text?
+		save_entry(@view.get_text)
+	    end
+	end
     end
 
 
