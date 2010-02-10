@@ -31,6 +31,19 @@ class Work_controller
 	@view = view
     end
 
+    def date=(date)
+	text_changed?
+
+	@date = date
+
+	@view.date_update(@date)
+
+	result = @db.fetch_text_entry(@date)
+
+	if !result.nil?
+	    @view.update_textview(result)
+	end
+    end
 
     def date_today
 	text_changed?

@@ -12,6 +12,113 @@
 
 require 'gtk2'
 
+######################################################################
+# Calendar Combo Box Entry
+######################################################################
+class CalendarComboBoxEntry < Gtk::HBox
+    type_register
+
+    # New Signal
+    DATE_UPDATE = 'date_update'
+    signal_new(DATE_UPDATE,
+	       GLib::Signal::RUN_FIRST,
+	       nil,
+	       nil,
+	       Date
+	      )
+    def signal_do_date_update(parms)
+#	puts "Emitting this signal and someone caught it?"
+    end
+
+    def initialize
+	super
+
+	# Create the entry & button
+	@entry = Gtk::Entry.new
+	self.pack_start(@entry, true, true, 1)
+
+	@button = Gtk::Button.new
+	@button.image = Gtk::Image.new('./view/arrow.png')
+
+	self.pack_start(@button, false, false, 0)
+
+	# Connect up the listeners
+	@button.signal_connect('clicked') {on_button}
+	@entry.signal_connect('key-press-event') {on_key_or_button_press}
+	@entry.signal_connect('button-press-event') {on_key_or_button_press}
+
+	# Create the calendar so that when it pops up it has the right date
+	@calendar = Gtk::Calendar.new
+    end
+
+    def date=(date)
+	@entry.text = date.to_s
+
+	@calendar.select_month(date.month, date.year)
+	@calendar.select_day(date.day)
+    end
+
+    private
+    def on_key_or_button_press
+	@button.clicked
+    end
+
+    def on_button
+	window_pos = parent.parent_window.position
+	widget_pos = [@entry.allocation.x,  @entry.allocation.y]
+	shift = [0, @entry.allocation.height]
+
+	@cal_pos = Array.new
+	@cal_pos[0] = window_pos[0] + widget_pos[0] + shift[0]
+	@cal_pos[1] = window_pos[1] + widget_pos[1] + shift[1]
+
+	# Creating the Dialog box & Calendar
+	@dialog = Gtk::Dialog.new(nil,
+				  nil,
+				  Gtk::Dialog::MODAL | Gtk::Dialog::NO_SEPARATOR)
+	@dialog.decorated = false
+	@dialog.move(@cal_pos[0], @cal_pos[1]) # Probably ignored
+	@dialog.vbox.pack_start(@calendar, false, false)
+
+	# Listeners
+	@calendar.signal_connect('day-selected', 'day-selected') {|inst, sig| on_select(inst, sig)}
+	@calendar.signal_connect('month-changed', 'month-changed') {|inst, sig| on_select(inst, sig)}
+	@dialog.signal_connect('button-press-event') {on_button_press}
+
+	@dialog.show_all
+	@dialog.move(@cal_pos[0], @cal_pos[1]) # Try again
+	@dialog.run
+    end
+
+    def on_button_press
+	if (not @month_changed)
+	    cd = @calendar.date
+	    date = Date.new(y=cd[0], m=cd[1], d=cd[2])
+
+	    # Update anyone who is interested in the new date
+	    signal_emit(DATE_UPDATE, date)
+
+	    @entry.text = date.to_s
+	    @dialog.vbox.remove(@calendar)
+	    @dialog.destroy
+	else
+	    @month_changed = false
+	end
+    end
+
+    def on_select(calendar, signal_name)
+	if signal_name == 'month-changed'
+	    @month_changed = true
+	else
+	    @month_changed = false
+	end
+    end
+end
+
+
+######################################################################
+# Work view
+######################################################################
 class Work_view
 
     def initialize(controller)
@@ -57,17 +164,24 @@ class Work_view
     def date_init
 	date = @controller.date_today
 
-	# Setup the date_dropdown combobox
-	date_dropdown = @builder.get_object('date')
-	list_store = Gtk::ListStore.new(String)
-	date_dropdown.model = list_store
-	date_dropdown.text_column = 0
+	# Remove the old date widget
+	hbox = @builder.get_object('button_hbox')
+	hbox.remove(@builder.get_object('date'))
+	
+	widget = CalendarComboBoxEntry.new
 
-	# Set the date in the combobox
-	(list_store.append())[0] = date.to_s
-	date_dropdown.active = 0
+	# Adding the new dropdown calendar widget
+	hbox.add(widget)
+	hbox.reorder_child(widget, 1)
+	hbox.set_child_packing(widget, false, true, 0, Gtk::PACK_START)
 
-	# TODO: Calendar dropdown
+	# due to the builder not updating properly...
+	@date_widget = widget
+
+	# Date widget will want to update the controller's concept of date
+	@date_widget.signal_connect(CalendarComboBoxEntry::DATE_UPDATE) do |obj, date|
+	    @controller.date = date
+	end
     end
 
 
@@ -196,13 +310,7 @@ class Work_view
 
 
     def date_update(date)
-	date_dropdown = @builder.get_object('date')
-	model = date_dropdown.model
-
-	# Reset the date in the dropdown
-	model.clear
-	model.append()[0] = date.to_s
-	date_dropdown.active = 0
+	@date_widget.date = date
     end
 
 
