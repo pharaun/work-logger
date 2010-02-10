@@ -11,6 +11,7 @@
 #
 
 require 'gtk2'
+require 'date'
 
 ######################################################################
 # Calendar Combo Box Entry
