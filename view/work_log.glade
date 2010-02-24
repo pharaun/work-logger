@@ -51,6 +51,25 @@
                       </object>
                     </child>
                     <child>
+                      <object class="GtkMenuItem" id="import">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">_Import...</property>
+                        <property name="use_underline">True</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="export">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Expor_t...</property>
+                        <property name="use_underline">True</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkSeparatorMenuItem" id="separator_file2">
+                        <property name="visible">True</property>
+                      </object>
+                    </child>
+                    <child>
                       <object class="GtkImageMenuItem" id="quit">
                         <property name="label">gtk-quit</property>
                         <property name="visible">True</property>
@@ -186,7 +205,7 @@
                 <property name="left_padding">6</property>
                 <child>
                   <object class="GtkButton" id="back">
-                    <property name="label" translatable="yes">gtk-go-back</property>
+                    <property name="label">gtk-go-back</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
@@ -229,7 +248,7 @@
                 <property name="right_padding">6</property>
                 <child>
                   <object class="GtkButton" id="forward">
-                    <property name="label" translatable="yes">gtk-go-forward</property>
+                    <property name="label">gtk-go-forward</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
@@ -248,7 +267,7 @@
                 <property name="right_padding">6</property>
                 <child>
                   <object class="GtkButton" id="save_entry">
-                    <property name="label" translatable="yes">gtk-save</property>
+                    <property name="label">gtk-save</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
