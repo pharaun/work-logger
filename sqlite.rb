@@ -90,7 +90,11 @@ class Sqlite
 
 
     def check_filename(filename)
-	if filename =~ /^.*\.sqlite/
+	if filename == nil
+	    raise RuntimeError, "Nil filename!", caller
+	elsif filename.empty?
+	    raise RuntimeError, "Empty filename!", caller
+	elsif filename =~ /^.+\.sqlite/
 	    return filename
 	else
 	    return "#{filename}.sqlite"

@@ -59,6 +59,10 @@ class CalendarComboBoxEntry < Gtk::HBox
 	@calendar.select_day(date.day)
     end
 
+    def clear
+	@entry.text = ""
+    end
+
     private
     def on_key_or_button_press
 	@button.clicked
@@ -86,6 +90,11 @@ class CalendarComboBoxEntry < Gtk::HBox
 	@calendar.signal_connect('month-changed', 'month-changed') {|inst, sig| on_select(inst, sig)}
 	@dialog.signal_connect('button-press-event') {on_button_press}
 
+	# Select the correct date
+	date = Date.parse(@entry.text)
+	@calendar.select_month(date.month, date.year)
+	@calendar.select_day(date.day)
+
 	@dialog.show_all
 	@dialog.move(@cal_pos[0], @cal_pos[1]) # Try again
 	@dialog.run
@@ -102,6 +111,9 @@ class CalendarComboBoxEntry < Gtk::HBox
 	    @entry.text = date.to_s
 	    @dialog.vbox.remove(@calendar)
 	    @dialog.destroy
+
+	    # Re-create a new calendar
+	    @calendar = Gtk::Calendar.new
 	else
 	    @month_changed = false
 	end
@@ -390,7 +402,7 @@ class Work_view
 	about.program_name = "Work Logger"
 
 	about.version = "0.1 - Alpha"
-	about.copyright = "Copyright (c) 2009, Anja Berens"
+	about.copyright = "Copyright (c) 2009, 2010 Anja Berens"
 
 	about.license = "You can redistribute it and/or modify it under the terms of the GPL's licence."
 	about.wrap_license = true
@@ -451,6 +463,7 @@ class Work_view
 	scrolled.sensitive = false
 	edit_menu.sensitive = false
 	close.sensitive = false
+	@date_widget.clear
     end
 
 

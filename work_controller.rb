@@ -161,6 +161,10 @@ class Work_controller
 
 
     def santize_filename(filename)
-	return @db.check_filename(filename)
+	begin
+	    return @db.check_filename(filename)
+	rescue
+	    return nil
+	end
     end
 end
