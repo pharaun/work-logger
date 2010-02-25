@@ -1,4 +1,3 @@
-#!/usr/bin/env ruby
 # Work logger
 #
 # Copyright (c) 2009, Anja Berens
@@ -11,46 +10,36 @@
 #
 
 require 'gtk2'
+require 'config'
 
-class Work_controller
+module Work
+    class Controller
 
-    def initialize(db)
-	@db = db
+	def initialize(db)
+	    @db = db
 
-	@date = date_today
+	    @date = date_today
 
-	# Text changed indicators
-	@text_changed = false
-	@user_action = false
-    end
+	    # Text changed indicators
+	    @text_changed = false
+	    @user_action = false
 
-    attr_accessor :text_changed, :user_action
-
-
-    def set_view(view)
-	@view = view
-    end
-
-    def date=(date)
-	text_changed?
-
-	@date = date
-
-	@view.date_update(@date)
-
-	result = @db.fetch_text_entry(@date)
-
-	if !result.nil?
-	    @view.update_textview(result)
+	    # Load up the config
+	    @config = Config.new
 	end
-    end
 
-    def date_today
-	text_changed?
+	attr_accessor :text_changed, :user_action
 
-	@date = Date.today(Date::ENGLAND)
 
-	if !@view.nil?
+	def set_view(view)
+	    @view = view
+	end
+
+	def date=(date)
+	    text_changed?
+
+	    @date = date
+
 	    @view.date_update(@date)
 
 	    result = @db.fetch_text_entry(@date)
@@ -60,111 +49,127 @@ class Work_controller
 	    end
 	end
 
-	return @date
-    end
-
-
-    def date_back
-	text_changed?
-
-	@date = @date - 1
-
-	@view.date_update(@date)
-
-	result = @db.fetch_text_entry(@date)
-
-	if !result.nil?
-	    @view.update_textview(result)
-	end
-
-	return @date
-    end
-
-
-    def date_forward
-	text_changed?
-
-	@date = @date + 1
-
-	@view.date_update(@date)
-
-	result = @db.fetch_text_entry(@date)
-
-	if !result.nil?
-	    @view.update_textview(result)
-	end
-
-	return @date
-    end
-
-
-    def new_database(filename)
-	if @db.open?
+	def date_today
 	    text_changed?
 
-	    @db.close
+	    @date = Date.today(Date::ENGLAND)
+
+	    if !@view.nil?
+		@view.date_update(@date)
+
+		result = @db.fetch_text_entry(@date)
+
+		if !result.nil?
+		    @view.update_textview(result)
+		end
+	    end
+
+	    return @date
 	end
 
-	@db.create(filename)
 
-	@view.update_textview("")
-    end
-
-
-    def open_database(filename)
-	if @db.open?
+	def date_back
 	    text_changed?
 
-	    @db.close
+	    @date = @date - 1
+
+	    @view.date_update(@date)
+
+	    result = @db.fetch_text_entry(@date)
+
+	    if !result.nil?
+		@view.update_textview(result)
+	    end
+
+	    return @date
 	end
 
-	@db.open(filename)
 
-	@view.date_update(date_today)
-
-	result = @db.fetch_text_entry(@date)
-
-	if !result.nil?
-	    @view.update_textview(result)
-	end
-    end
-
-
-    def close_database
-	if @db.open?
+	def date_forward
 	    text_changed?
 
-	    @db.close
+	    @date = @date + 1
+
+	    @view.date_update(@date)
+
+	    result = @db.fetch_text_entry(@date)
+
+	    if !result.nil?
+		@view.update_textview(result)
+	    end
+
+	    return @date
+	end
+
+
+	def new_database(filename)
+	    if @db.open?
+		text_changed?
+
+		@db.close
+	    end
+
+	    @db.create(filename)
 
 	    @view.update_textview("")
 	end
-    end
 
 
-    def save_entry(text)
-	@db.store_text_entry(@date, text)
-    end
+	def open_database(filename)
+	    if @db.open?
+		text_changed?
 
+		@db.close
+	    end
 
-    def text_changed?
-	if (@text_changed and @user_action)
-	    if @view.save_text?
-		save_entry(@view.get_text)
+	    @db.open(filename)
+
+	    @view.date_update(date_today)
+
+	    result = @db.fetch_text_entry(@date)
+
+	    if !result.nil?
+		@view.update_textview(result)
 	    end
 	end
-    end
 
 
-    def file_regex
-	return @db.file_regex
-    end
+	def close_database
+	    if @db.open?
+		text_changed?
+
+		@db.close
+
+		@view.update_textview("")
+	    end
+	end
 
 
-    def santize_filename(filename)
-	begin
-	    return @db.check_filename(filename)
-	rescue
-	    return nil
+	def save_entry(text)
+	    @db.store_text_entry(@date, text)
+	end
+
+
+	def text_changed?
+	    if (@text_changed and @user_action)
+		if @view.save_text?
+		    save_entry(@view.get_text)
+		end
+	    end
+	end
+
+
+	def file_regex
+	    return @db.file_regex
+	end
+
+
+	def santize_filename(filename)
+	    begin
+		return @db.check_filename(filename)
+	    rescue
+		return nil
+	    end
 	end
     end
 end
