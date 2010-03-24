@@ -20,6 +20,8 @@ module Work
 	    if file != nil
 		puts "Loading config..."
 		@config = YAML.load_file(file)
+	    else
+		@config = Hash.new
 	    end
 	end
 	
