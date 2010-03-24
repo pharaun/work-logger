@@ -1,4 +1,3 @@
-#!/usr/bin/env ruby
 # Work logger
 #
 # Copyright (c) 2009, Anja Berens

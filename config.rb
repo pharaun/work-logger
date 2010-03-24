@@ -12,6 +12,7 @@ module Work
     class Config
 	def initialize
 	    puts "config"
+	    @configChanged = false
 
 	    # Locate a config file
 	    file = locate_config
@@ -23,6 +24,19 @@ module Work
 	end
 	
 	def save_config
+	    puts "Config needs saving? #{@configChanged}"
+	end
+
+	attr_reader :configChanged
+
+	# Implement some basic Hashlike operations
+	def [](key)
+	    return @config[key]
+	end
+
+	def []=(key, value)
+	    @configChanged = true
+	    @config[key] = value
 	end
 
 	private

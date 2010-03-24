@@ -15,9 +15,7 @@ require 'config'
 module Work
     class Controller
 
-	def initialize(db)
-	    @db = db
-
+	def initialize
 	    @date = date_today
 
 	    # Text changed indicators
@@ -26,6 +24,12 @@ module Work
 
 	    # Load up the config
 	    @config = Config.new
+
+	    # Load the "last file" type driver code
+	    filetype = @config['file_type']
+	    puts "Loading: #{filetype}"
+	    load "#{filetype}.rb"
+	    @db = eval("Work::#{filetype.capitalize}.new")
 	end
 
 	attr_accessor :text_changed, :user_action
@@ -33,6 +37,17 @@ module Work
 
 	def set_view(view)
 	    @view = view
+
+	    # At this point its not exactly the most ideal spot to put this
+	    # code, but...
+
+	    # Loads the last open file
+	    file = @config['last_file']
+	    if not (file.nil?)
+		puts "Loading: #{file}"
+		open_database(file)
+		@view.sensitive
+	    end
 	end
 
 	def date=(date)
@@ -170,6 +185,11 @@ module Work
 	    rescue
 		return nil
 	    end
+	end
+
+	def quit
+	    close_database
+	    @config.save_config
 	end
     end
 end

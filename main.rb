@@ -10,10 +10,8 @@
 require 'gtk2'
 require 'view'
 require 'controller'
-require 'sqlite'
 
-sqlite = Work::Sqlite.new
-controller = Work::Controller.new(sqlite)
+controller = Work::Controller.new
 view = Work::View.new(controller)
 controller.set_view(view)
 

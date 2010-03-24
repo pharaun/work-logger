@@ -1,4 +1,3 @@
-#!/usr/bin/env ruby
 # Work logger
 #
 # Copyright (c) 2009, Anja Berens
@@ -372,8 +371,7 @@ module Work
 
 
 	def quit_app
-	    window = @builder.get_object('work_logger')
-	    @controller.close_database
+	    @controller.quit
 
 	    Gtk.main_quit
 	end
