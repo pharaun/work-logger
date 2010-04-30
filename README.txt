@@ -14,14 +14,12 @@
 
 6) Fix the dialog/calendar dropdown creating a new window on the taskbar
 7) Add "support" for registering config change listeners into Work::Config
-8) Finish the config.rb stuff, adds in support for saving the config
-9) finish adding the config into the controller, and having it generate a new
-config if needed, in other word if there is no config that exist, have it
-generate the new config upon "open" or "new" filetype/database backend
 
-10) Fix this - No config file anywhere:
+8) Fix this - No config file anywhere:
 Loading: 
 ./controller.rb:31:in `load': no such file to load -- .rb (LoadError)
 	from ./controller.rb:31:in `initialize'
 	from ./main.rb:14:in `new'
 	from ./main.rb:14
+
+9) Fix it when the file that the config refers to does not exist anymore

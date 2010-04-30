@@ -12,21 +12,44 @@ module Work
     class Config
 	def initialize
 	    puts "config"
+
+	    # Topmost location is the first one to check/save to
+	    @location = [
+	    './.workloggerrc',
+	    '~/.workloggerrc',
+	    '~/.worklogger/config',
+	    '/etc/worklogger/config'
+	    ]
+
 	    @configChanged = false
 
 	    # Locate a config file
-	    file = locate_config
+	    @file = locate_config
 
-	    if file != nil
+	    if @file != nil
 		puts "Loading config..."
-		@config = YAML.load_file(file)
+		@config = YAML.load_file(@file)
 	    else
 		@config = Hash.new
 	    end
 	end
 	
 	def save_config
-	    puts "Config needs saving? #{@configChanged}"
+	    if @configChanged
+		puts "Saving config..."
+		@configChanged = false
+
+		if @file != nil
+		    File.open( @file, 'w' ) do |out|
+			YAML.dump(@config, out)
+		    end
+		else
+		    # Select first location to save to
+		    File.open( @location.first, 'w' ) do |out|
+			YAML.dump(@config, out)
+		    end
+		end
+	    end
 	end
 
 	attr_reader :configChanged
@@ -43,14 +66,7 @@ module Work
 
 	private
 	def locate_config
-	    location = [
-	    './.workloggerrc',
-	    '~/.workloggerrc',
-	    '~/.worklogger/config',
-	    '/etc/worklogger/config'
-	    ]
-
-	    location.each do |loc|
+	    @location.each do |loc|
 		file = File.expand_path(loc)
 		
 		if File.file?(file)

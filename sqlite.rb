@@ -88,6 +88,11 @@ module Work
 	    return "*.sqlite"
 	end
 
+	
+	def file_type
+	    return "sqlite"
+	end
+
 
 	def check_filename(filename)
 	    if filename == nil

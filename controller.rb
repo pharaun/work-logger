@@ -125,6 +125,8 @@ module Work
 	    end
 
 	    @db.create(filename)
+	    @config['last_file'] = filename
+	    @config['file_type'] = @db.file_type
 
 	    @view.update_textview("")
 	end
@@ -138,6 +140,8 @@ module Work
 	    end
 
 	    @db.open(filename)
+	    @config['last_file'] = filename
+	    @config['file_type'] = @db.file_type
 
 	    @view.date_update(date_today)
 
