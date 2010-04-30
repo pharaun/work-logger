@@ -27,7 +27,7 @@ module Work
 
 	    # Load the "last file" type driver code
 	    filetype = @config['file_type']
-	    puts "Loading: #{filetype}"
+	    puts "Loading support for: #{filetype}"
 	    load "#{filetype}.rb"
 	    @db = eval("Work::#{filetype.capitalize}.new")
 	end
@@ -44,9 +44,13 @@ module Work
 	    # Loads the last open file
 	    file = @config['last_file']
 	    if not (file.nil?)
-		puts "Loading: #{file}"
-		open_database(file)
-		@view.sensitive
+		if File.file?(file)
+		    if File.readable?(file)
+			puts "Loading: #{file}"
+			open_database(file)
+			@view.sensitive
+		    end
+		end
 	    end
 	end
 
@@ -140,9 +144,16 @@ module Work
 	    end
 
 	    @db.open(filename)
-	    @config['last_file'] = filename
-	    @config['file_type'] = @db.file_type
 
+	    # If last_file is nil or not the same then store the opened file
+	    if @config['last_file'] == nil
+		@config['last_file'] = filename
+		@config['file_type'] = @db.file_type
+	    elsif @config['last_file'] != filename
+		@config['last_file'] = filename
+		@config['file_type'] = @db.file_type
+	    end
+	    
 	    @view.date_update(date_today)
 
 	    result = @db.fetch_text_entry(@date)

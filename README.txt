@@ -21,5 +21,3 @@ Loading:
 	from ./controller.rb:31:in `initialize'
 	from ./main.rb:14:in `new'
 	from ./main.rb:14
-
-9) Fix it when the file that the config refers to does not exist anymore

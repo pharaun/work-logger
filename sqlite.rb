@@ -10,12 +10,6 @@ require 'sqlite3'
 
 module Work
     class Sqlite
-
-	def initialize
-	    puts "sqlite db"
-	end
-
-	
 	def create(filename)
 	    if File.exists?(filename)
 		raise IOError, "File already exist!", caller

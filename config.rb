@@ -11,8 +11,6 @@ require 'yaml'
 module Work
     class Config
 	def initialize
-	    puts "config"
-
 	    # Topmost location is the first one to check/save to
 	    @location = [
 	    './.workloggerrc',
@@ -27,7 +25,7 @@ module Work
 	    @file = locate_config
 
 	    if @file != nil
-		puts "Loading config..."
+		puts "Loading config: #{@file}"
 		@config = YAML.load_file(@file)
 	    else
 		@config = Hash.new
@@ -36,7 +34,6 @@ module Work
 	
 	def save_config
 	    if @configChanged
-		puts "Saving config..."
 		@configChanged = false
 
 		if @file != nil
@@ -45,10 +42,13 @@ module Work
 		    end
 		else
 		    # Select first location to save to
-		    File.open( @location.first, 'w' ) do |out|
+		    @file = @location.first
+		    File.open( @file, 'w' ) do |out|
 			YAML.dump(@config, out)
 		    end
 		end
+		
+		puts "Saving config: #{@file}"
 	    end
 	end
 
