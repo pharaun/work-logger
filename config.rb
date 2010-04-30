@@ -27,6 +27,11 @@ module Work
 	    if @file != nil
 		puts "Loading config: #{@file}"
 		@config = YAML.load_file(@file)
+
+		# If there is nothing to parse/load YAML will return "false"
+		if not @config
+		    @config = Hash.new
+		end
 	    else
 		@config = Hash.new
 	    end

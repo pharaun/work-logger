@@ -27,9 +27,15 @@ module Work
 
 	    # Load the "last file" type driver code
 	    filetype = @config['file_type']
-	    puts "Loading support for: #{filetype}"
-	    load "#{filetype}.rb"
-	    @db = eval("Work::#{filetype.capitalize}.new")
+	    if filetype != nil
+		puts "Loading support for: #{filetype}"
+		load "#{filetype}.rb"
+		@db = eval("Work::#{filetype.capitalize}.new")
+	    else
+		puts "Exiting program for now, because adding file types support"
+		puts "isn't an easy task so exiting for now"
+		exit 1
+	    end
 	end
 
 	attr_accessor :text_changed, :user_action
