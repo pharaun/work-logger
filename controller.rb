@@ -26,7 +26,7 @@ module Work
 	    @config = Config.new
 
 	    # Load the "last file" type driver code
-	    filetype = @config['file_type']
+	    filetype = @config['file']['type']
 	    if filetype != nil
 		puts "Loading support for: #{filetype}"
 		load "#{filetype}.rb"
@@ -48,7 +48,7 @@ module Work
 	    # code, but...
 
 	    # Loads the last open file
-	    file = @config['last_file']
+	    file = @config['file']['last']
 	    if not (file.nil?)
 		if File.file?(file)
 		    if File.readable?(file)
@@ -135,8 +135,8 @@ module Work
 	    end
 
 	    @db.create(filename)
-	    @config['last_file'] = filename
-	    @config['file_type'] = @db.file_type
+	    @config['file']['last'] = filename
+	    @config['file']['type'] = @db.file_type
 
 	    @view.update_textview("")
 	end
@@ -152,12 +152,12 @@ module Work
 	    @db.open(filename)
 
 	    # If last_file is nil or not the same then store the opened file
-	    if @config['last_file'] == nil
-		@config['last_file'] = filename
-		@config['file_type'] = @db.file_type
-	    elsif @config['last_file'] != filename
-		@config['last_file'] = filename
-		@config['file_type'] = @db.file_type
+	    if @config['file']['last'] == nil
+		@config['file']['last'] = filename
+		@config['file']['type'] = @db.file_type
+	    elsif @config['file']['last'] != filename
+		@config['file']['last'] = filename
+		@config['file']['type'] = @db.file_type
 	    end
 	    
 	    @view.date_update(date_today)
