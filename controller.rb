@@ -39,14 +39,16 @@ module Work
 	    end
 
 	    # Load the "last file" type driver code
-	    filetype = @config['file']['type']
-	    if filetype != nil
-		@db = @file_type[filetype]
-	    else
-		puts "Got a directory loading for filetype working..."
-		puts "Exiting program for now, because adding file types support"
-		puts "isn't an easy task so exiting for now"
-		exit 1
+	    if @config['file'] != nil
+		filetype = @config['file']['type']
+		if filetype != nil
+		    @db = @file_type[filetype]
+		else
+		    puts "Got a directory loading for filetype working..."
+		    puts "Exiting program for now, because adding file types support"
+		    puts "isn't an easy task so exiting for now"
+		    exit 1
+		end
 	    end
 	end
 
@@ -60,13 +62,15 @@ module Work
 	    # code, but...
 
 	    # Loads the last open file
-	    file = @config['file']['last']
-	    if not (file.nil?)
-		if File.file?(file)
-		    if File.readable?(file)
-			puts "Loading: #{file}"
-			open_database(file)
-			@view.sensitive
+	    if @config['file'] != nil
+		file = @config['file']['last']
+		if not (file.nil?)
+		    if File.file?(file)
+			if File.readable?(file)
+			    puts "Loading: #{file}"
+			    open_database(file)
+			    @view.sensitive
+			end
 		    end
 		end
 	    end
@@ -147,8 +151,10 @@ module Work
 	    end
 
 	    @db.create(filename)
-	    @config['file']['last'] = filename
-	    @config['file']['type'] = @db.file_type
+	    if @config['file'] != nil
+		@config['file']['last'] = filename
+		@config['file']['type'] = @db.file_type
+	    end
 
 	    @view.update_textview("")
 	end
@@ -164,12 +170,14 @@ module Work
 	    @db.open(filename)
 
 	    # If last_file is nil or not the same then store the opened file
-	    if @config['file']['last'] == nil
-		@config['file']['last'] = filename
-		@config['file']['type'] = @db.file_type
-	    elsif @config['file']['last'] != filename
-		@config['file']['last'] = filename
-		@config['file']['type'] = @db.file_type
+	    if @config['file'] != nil
+		if @config['file']['last'] == nil
+		    @config['file']['last'] = filename
+		    @config['file']['type'] = @db.file_type
+		elsif @config['file']['last'] != filename
+		    @config['file']['last'] = filename
+		    @config['file']['type'] = @db.file_type
+		end
 	    end
 	    
 	    @view.date_update(date_today)
@@ -208,16 +216,32 @@ module Work
 
 
 	def file_regex
-	    return @db.file_regex
+	    ret = Array.new
+	    @file_type.each_value do |db|
+		ret.push(db.file_regex)
+	    end
+
+	    return ret
 	end
 
 
 	def santize_filename(filename)
-	    begin
-		return @db.check_filename(filename)
-	    rescue
-		return nil
+	    if ((filename != nil) && !(filename.empty?))
+		@file_type.each_value do |db|
+		    if filename.match("#{db.file_type}")
+			@db = db
+			return filename
+		    end
+		end
+
+		begin
+		    return @db.check_filename(filename)
+		rescue
+		    return nil
+		end
 	    end
+
+	    return nil
 	end
 
 	def quit

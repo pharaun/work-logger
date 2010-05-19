@@ -79,7 +79,7 @@ module Filetype
 
 
 	def file_regex
-	    return "*.sqlite"
+	    return "*.#{file_type}"
 	end
 
 	
@@ -93,10 +93,10 @@ module Filetype
 		raise RuntimeError, "Nil filename!", caller
 	    elsif filename.empty?
 		raise RuntimeError, "Empty filename!", caller
-	    elsif filename =~ /^.+\.sqlite/
+	    elsif filename =~ /^.+\.#{file_type}/
 		return filename
 	    else
-		return "#{filename}.sqlite"
+		return "#{filename}.#{file_type}"
 	    end
 	end
 

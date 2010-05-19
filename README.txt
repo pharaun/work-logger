@@ -22,3 +22,8 @@ Loading:
 
 7) Add in edge checks on writing out the config, such as cannot write to the
 file and so forth
+
+8) Figure out how to deal with more than 1 file type, esp for "new" db, and
+probably spend some time cleaning up the controller/API a bit to seperate out
+the santize_filename function into two function, one for creating and one for
+opening databases

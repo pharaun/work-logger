@@ -219,6 +219,7 @@ module Work
 
 	    open.signal_connect('activate') do
 		filename = file_choicer("Open Database", false)
+		p filename
 		if !filename.nil?
 		    @controller.open_database(filename)
 		    sensitive
@@ -439,7 +440,9 @@ module Work
 
 	    # File filter
 	    filter = Gtk::FileFilter.new
-	    filter.add_pattern(@controller.file_regex)
+	    @controller.file_regex.each do |regex|
+		filter.add_pattern(regex)
+	    end
 	    filter.name = "Database File"
 	    dialog.filter = filter
 
