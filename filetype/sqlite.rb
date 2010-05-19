@@ -8,7 +8,7 @@
 
 require 'sqlite3'
 
-module Work
+module Filetype
     class Sqlite
 	def create(filename)
 	    if File.exists?(filename)

@@ -64,6 +64,8 @@ module Work
 	    return @config[key]
 	end
 
+	# Looks like we might not even need this, i'm thinking it might
+	# be needed to inject this setter into the hash itself
 	def []=(key, value)
 	    @configChanged = true
 	    @config[key] = value

@@ -25,13 +25,25 @@ module Work
 	    # Load up the config
 	    @config = Config.new
 
+	    # Scan the filetype directory for each filetype and register/load it
+	    @file_type = Hash.new
+
+	    Dir.glob("filetype/*.rb") do |file|
+		load file
+		filetype = /.*\/(.*)\.[Rr][Bb]/.match(file)[1]
+		tmp = eval("Filetype::#{filetype.capitalize}.new")
+
+		@file_type[tmp.file_type] = tmp
+
+		puts "Loaded support for: #{filetype}"
+	    end
+
 	    # Load the "last file" type driver code
 	    filetype = @config['file']['type']
 	    if filetype != nil
-		puts "Loading support for: #{filetype}"
-		load "#{filetype}.rb"
-		@db = eval("Work::#{filetype.capitalize}.new")
+		@db = @file_type[filetype]
 	    else
+		puts "Got a directory loading for filetype working..."
 		puts "Exiting program for now, because adding file types support"
 		puts "isn't an easy task so exiting for now"
 		exit 1
